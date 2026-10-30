@@ -1,0 +1,45 @@
+<!doctype html><html lang="zh-TW"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NFC 名片程式導讀與學習單</title><link rel="stylesheet" href="教材樣式.css"></head><body><main>
+<nav><a href="開始閱讀.html">套件首頁</a><a href="01教師教案.html">教師教案</a><a href="02學生實作講義.html">學生講義</a></nav>
+<header><p class="eyebrow">03　程式導讀與學習單</p><h1>從修改範本到理解程式</h1><p class="lead">對照 index.html 與 style.css 閱讀。基礎題著重看懂資料如何流動；長行折行等格式細節列為進階閱讀，不必在第一堂背下來。</p></header>
+<h2>一 用同一個作品學三種語言</h2><table><thead><tr><th>角色</th><th>本範本例子</th><th>修改後的結果</th></tr></thead><tbody><tr><td>HTML 內容結構</td><td>main、h1、button、nav</td><td>決定哪些元素存在、誰是標題及按鈕</td></tr><tr><td>CSS 視覺樣式</td><td>.card、--accent、max-width</td><td>改變色彩、留白與不同寬度下的排版</td></tr><tr><td>JavaScript 資料與行為</td><td>profile、textContent、addEventListener</td><td>填入姓名、建立技能、回應點擊並產生檔案</td></tr></tbody></table>
+<h3>導讀 A HTML 元素與屬性</h3><pre><code>&lt;h1&gt;&lt;span id="displayName"&gt;&lt;/span&gt;&lt;/h1&gt;
+&lt;button type="button" id="saveContact"&gt;下載聯絡人 .vcf&lt;/button&gt;</code></pre><p><code>id</code> 是元素的識別名稱，讓 JS 找得到目標。<code>class</code> 可供 CSS 選擇多個同類元素。本範本使用真正的 button，因此可透過鍵盤啟動，不需用 div 模擬按鈕。</p><p><strong>先猜再做：</strong>把按鈕文字改成「儲存我的聯絡資料」，下載內容會變嗎？先寫預測，再實際操作。</p>
+<h3>導讀 B CSS 響應式寬度</h3><pre><code>.card {
+  width: 100%;
+  max-width: 400px;
+  padding: 28px 24px;
+}
+* { box-sizing: border-box; }</code></pre><p>卡片會配合容器縮小，最大 400px。border-box 讓 padding 和 border 算進設定寬度，有助於避免手機橫向溢出。全站有 viewport 設定，瀏覽器才會依裝置寬度呈現。背景模糊只是視覺效果，瀏覽器不支援時仍能閱讀。</p><p><strong>操作題：</strong>把 max-width 改為 460px，分別在寬螢幕與窄螢幕觀察差異。記錄後選一個適合的值。</p>
+<h3>導讀 C 物件是資料表 陣列是清單</h3><pre><code>const profile = {
+  familyName: "王",
+  givenName: "小晴",
+  skills: ["訪談", "資訊設計", "專案協作"]
+};
+const fullName = profile.familyName + profile.givenName;</code></pre><p>profile 是物件，欄位名稱對應值；skills 是陣列，可放多個技能。程式用 + 把姓與名連起來。<code>const</code> 宣告變數；初學階段先專心修改資料值。</p>
+<h3>導讀 D 把資料放到畫面</h3><pre><code>document.getElementById("displayName").textContent = fullName;</code></pre><p>先找到 id 是 displayName 的元素，再把姓名寫成純文字。本範本使用 textContent，不會把簡介中的 &lt; 或 &gt; 當成要執行的 HTML。技能則用 forEach 逐一建立 li，放進 ul。資料沒有來自後端，重新載入時直接讀取檔案內的 profile。</p><p><strong>操作題：</strong>在 skills 陣列加上第四個技能，預測是否要改 HTML，再驗證。</p>
+<h3>導讀 E 連結與條件</h3><p><code>tel:</code> 交給電話功能，<code>mailto:</code> 交給郵件 App，<code>https:</code> 開啟網站。本範本先做基本格式檢查；有效不代表電話真的有人接或信箱真的存在，仍須人工測試。空欄位會隱藏連結，錯誤格式會在卡片底部顯示提示。</p><pre><code>function setLink(id, href) {
+  const link = byId(id);
+  link.hidden = !href;
+  if (href) link.href = href;
+}</code></pre><p><code>!href</code> 在空字串時得到 true，代表要隱藏。使用者提供的網站只接受完整 HTTPS 網址；開新分頁的連結加上 rel="noopener noreferrer"。</p>
+<h2>二 無後端如何產生聯絡人</h2><div class="flow">profile → buildVCard 產生文字 → Blob 包成檔案<br>→ createObjectURL 建立暫存網址 → a.download 發出下載要求 → 使用者開檔匯入</div>
+<h3>vCard 的必要資訊與文字處理</h3><p>vCard 是一種有固定欄位名稱的文字交換格式，副檔名為 .vcf。本課採 3.0，包含 VERSION、FN 與 N。FN 是顯示姓名，N 用分號分隔姓、名等結構。ORG 表示單位，TITLE 表示職稱；沒提供有效電話或信箱時略過該欄。</p><pre><code>const lines = [
+  "BEGIN:VCARD",
+  "VERSION:3.0",
+  `N:${e(profile.familyName)};${e(profile.givenName)};;;`,
+  `FN:${e(fullName)}`,
+  `ORG:${e(profile.org)}`,
+  `TITLE:${e(profile.title)}`
+];</code></pre><p>反引號中的 <code>${...}</code> 會代入值。e 是 escapeVCard 的簡寫，將文字內的反斜線、換行、分號、逗號轉成格式允許的表示，避免使用者文字變成新的欄位或分隔符號。</p><p>本課用 UTF-8 儲存中文，欄位間以 CRLF（<code>\r\n</code>）分隔。進階的 foldVCardLine 以 UTF-8 位元組計算長度，超長內容接到以空白開頭的下一行。這些是檔案格式處理，與 CSS 自動換行不同。</p>
+<h3>事件 Blob 與下載</h3><pre><code>byId("saveContact").addEventListener("click", downloadVCard);
+const blob = new Blob([buildVCard()], {
+  type: "text/vcard;charset=utf-8"
+});</code></pre><p>addEventListener 註冊點擊事件，按下按鈕才執行下載函式。Blob 是瀏覽器記憶體中的資料包，不會把聯絡資料送到伺服器。程式建立暫存網址，讓 a 元素發出下載要求；稍後呼叫 revokeObjectURL 釋放暫存資源。a.download 是給瀏覽器的下載提示，裝置實際可能下載或交給應用程式開啟。</p><div class="note">網頁只能提出下載／開啟要求；匯入通訊錄由作業系統與使用者確認。請用實際手機驗證，不把桌面下載成功當成手機匯入成功。</div>
+<h2>三 小挑戰</h2><ol><li><strong>基礎：</strong>新增第四個技能，並用一句話解釋為什麼不必手動加一個 HTML 標籤。</li><li><strong>基礎：</strong>電話清空後下載 .vcf，檢查是否還有 TEL，說明畫面和檔案為何同步。</li><li><strong>應用：</strong>把簡介改成包含逗號或分號的句子。注意簡介本來只放在畫面；要測 vCard 跳脫，請改 org 或 title，再檢查 .vcf 中的反斜線。</li><li><strong>進階選做：</strong>在 profile 新增 portfolio，於 nav 增加對應連結，使用 httpsURL 與 setLink 處理網址；測試空白、有效 HTTPS 及錯誤網址三種情況。</li></ol>
+<h2 class="page">四 學習單與互測紀錄</h2><p>姓名／展示名：＿＿＿＿＿＿　測試同伴：＿＿＿＿＿＿　日期：＿＿＿＿＿＿</p><p>GitHub repository：＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿<br>正式網站網址：＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿</p><h3>任務前的預測</h3><p>改按鈕上的文字，會不會改變下載的姓名？請說明理由。</p><div class="answer">預測：<br>實測結果：</div><p>網頁改版後，什麼情況需要重新寫 NFC？</p><div class="answer"></div>
+<h3>測試矩陣</h3><p>結果填「通過／失敗／待補測」，寫明實際設備與瀏覽器。沒有測過的系統不填通過。手機證據請遮蔽非必要個資。</p><table><thead><tr><th>測試</th><th>設備／系統／瀏覽器</th><th>預期結果</th><th>實際結果與證據</th></tr></thead><tbody><tr><td>本機資料修改</td><td>＿＿＿＿</td><td>網頁姓名、簡介更新</td><td>＿＿＿＿</td></tr><tr><td>窄螢幕及鍵盤</td><td>＿＿＿＿</td><td>無橫向溢出；焦點清楚；可操作</td><td>＿＿＿＿</td></tr><tr><td>空電話欄位</td><td>＿＿＿＿</td><td>連結隱藏；.vcf 無 TEL</td><td>＿＿＿＿</td></tr><tr><td>正式網址無痕</td><td>＿＿＿＿</td><td>不用登入也能開頁</td><td>＿＿＿＿</td></tr><tr><td>中文聯絡人匯入</td><td>＿＿＿＿</td><td>姓名與信箱正確；有填電話時也正確</td><td>＿＿＿＿</td></tr><tr><td>網址欄位</td><td>＿＿＿＿</td><td>.vcf 使用正式 HTTPS 網址</td><td>＿＿＿＿</td></tr><tr><td>NFC Read 回查</td><td>＿＿＿＿</td><td>與正式網址相同</td><td>＿＿＿＿</td></tr><tr><td>第二支手機碰卡</td><td>＿＿＿＿</td><td>開啟正確名片</td><td>＿＿＿＿</td></tr><tr><td>改版後原卡重讀</td><td>＿＿＿＿</td><td>同一網址看見新內容</td><td>＿＿＿＿</td></tr></tbody></table>
+<h3>除錯紀錄</h3><p>至少記錄一項問題；如果作品沒有失敗，可用教師提供的「移動 CSS 檔案」或「暫時把測試副本的 github 改為不完整網址」觀察結果，完成後改回並重測。</p><div class="answer">發生現象：<br>我檢查的地方：<br>修正內容：<br>重測設備與結果：</div>
+<h3>離堂反思</h3><ol><li>用自己的話說明 HTML、CSS、JS 在這張名片中的分工。</li><li>如果 NFC 讀出網址成功，但網頁開不了，接下來該測哪兩個地方？</li><li>同伴最想點的功能是什麼？根據他的回饋，你下次要改哪一處？</li></ol><div class="answer" style="min-height:120px"></div>
+<details open><summary>教師用參考答案</summary><p>按鈕文字與 profile 姓名分開，改按鈕不會改 FN／N。正式網址改變或標籤原本寫錯時需重寫；同網址內容更新不需。NFC 讀到網址但網頁失敗，先手動輸入該網址驗證，再檢查網路、正式部署 Ready 與網域／保護設定。新增技能由 forEach 產生 li；電話畫面與檔案都依同一個 validPhone 判斷。</p></details>
+<p class="footer">若作為測驗，可先不發教師參考答案段落。此學習單可列印手寫，也可將回答另存文字檔繳交。</p>
+</main></body></html>

@@ -1,0 +1,42 @@
+<!doctype html><html lang="zh-TW"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NFC 數位名片學生實作講義</title><link rel="stylesheet" href="教材樣式.css"></head><body><main>
+<nav><a href="開始閱讀.html">套件首頁</a><a href="01教師教案.html">教師教案</a><a href="03程式導讀與學習單.html">程式與學習單</a></nav>
+<header><p class="eyebrow">02　學生實作講義</p><h1>做出你的 NFC 數位名片</h1><p class="lead">今天要完成一個別人用手機就能開啟的個人網頁，再把網址寫進 NFC 標籤。你只需修改三檔案範本，不必安裝 Node.js 或 npm。</p></header>
+<h2>第一站 想好你要介紹什麼</h2><p>想像你在成果展遇見想合作的人。寫下你的身分、能提供的能力與希望交流的方向。簡介避免只寫「我很認真」，改成具體內容，例如「我擅長整理訪談資料，希望找到一起做校園服務設計的夥伴」。</p><ul><li>姓名或展示名：＿＿＿＿＿＿　職稱／身分：＿＿＿＿＿＿</li><li>40 至 80 字簡介：＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿</li><li>三個技能：＿＿＿＿＿＿、＿＿＿＿＿＿、＿＿＿＿＿＿</li><li>願意公開的信箱／作品連結：＿＿＿＿＿＿＿＿＿＿＿＿</li></ul><div class="note">電話可留空。請只填願意公開的資料，範例信箱不是你的信箱。不要把登入密碼、學號或任何金鑰貼進程式。</div>
+<h2>第二站 找到三個檔案</h2><p>解壓縮教材，打開 <code>my-nfc-card</code>，內有以下三檔。保留它們在同一個資料夾。</p><pre>my-nfc-card/
+├── index.html   個人資料、網頁結構、原生 JavaScript
+├── style.css    配色、字級、排版與手機樣式
+└── README.md    修改及發布說明</pre><ol><li>雙擊 <code>index.html</code>，確認瀏覽器看得到預設名片。</li><li>用純文字編輯器開啟同一個 <code>index.html</code>。不要用 Word 編輯程式。</li><li>若 Windows 沒顯示副檔名，先在檔案總管開啟「顯示副檔名」，避免誤存為 <code>index.html.txt</code>。</li></ol>
+<h2>第三站 只改頂部個人資料</h2><p>找到「學生編輯區」的 <code>const profile = { ... }</code>。只改冒號後的值。下面是示意，請修改原檔，不必把整段重複貼一次。</p><pre><code>const profile = {
+  familyName: "王",
+  givenName: "小晴",
+  nickname: "Sunny",
+  avatar: "晴",
+  title: "設計系學生 / 校園服務觀察者",
+  org: "我的學校",
+  bio: "我喜歡透過訪談與設計，讓校園服務更容易使用。期待與不同領域的夥伴合作。",
+  phone: "",
+  email: "student@example.com",
+  github: "https://github.com/你的帳號",
+  skills: ["訪談", "資訊設計", "專案協作"],
+  website: ""
+};</code></pre>
+<table><thead><tr><th>欄位</th><th>修改規則</th></tr></thead><tbody><tr><td>familyName／givenName</td><td>分別填姓與名，畫面自動組合，聯絡人也用同一份資料</td></tr><tr><td>nickname／avatar</td><td>暱稱選填；頭像用一個字或短縮寫</td></tr><tr><td>title／org／bio</td><td>身分、單位與個人簡介；在引號內編輯</td></tr><tr><td>phone</td><td>選填；格式如 +886912345678。台灣手機 0912… 改國際格式時去掉開頭 0，再加 +886</td></tr><tr><td>email</td><td>自己的公開信箱；不想公開可填 ""</td></tr><tr><td>github</td><td>完整 https:// 網址；不需要可填 ""</td></tr><tr><td>skills</td><td>每個技能有引號，以英文逗號分隔；空陣列 [] 會沒有技能標籤</td></tr><tr><td>website</td><td>部署前留空；取得正式網址後再填</td></tr></tbody></table>
+<p><strong>語法小提醒：</strong>保留英文雙引號 <code>"</code>、逗號 <code>,</code>、大括號 <code>{}</code>。不要用中文全形引號取代。字串中要寫英文雙引號時，使用 <code>\"</code>，或改用中文「」；實際換行用 <code>\n</code>。修改後按儲存，再回瀏覽器重新整理。</p>
+<p><strong>檢核 A：</strong>姓名和簡介是你自己的；至少三個技能；電話留空時不顯示電話連結；卡片底部沒有欄位格式錯誤提示。</p>
+<h2>第四站 改一點樣式並測試下載</h2><ol><li>開啟 <code>style.css</code>，試改頂部 <code>--accent: #38bdf8;</code>，例如改為 <code>#5eead4</code>。儲存後重新整理，觀察職稱與標籤顏色。</li><li>把瀏覽器視窗縮窄到手機寬度。確認姓名、簡介與按鈕沒有被切掉，也沒有左右捲動。</li><li>按 Tab 鍵切換焦點，應看得到焦點外框；按 Enter 或空白鍵可啟動下載按鈕。</li><li>點「下載聯絡人 .vcf」，到瀏覽器下載項目找檔案，用文字編輯器檢查內容。</li></ol><pre>BEGIN:VCARD
+VERSION:3.0
+N:王;小晴;;;
+FN:王小晴
+ORG:我的學校
+TITLE:設計系學生 / 校園服務觀察者
+…
+END:VCARD</pre><p>有填 Email 才會有 EMAIL；有填有效電話才會有 TEL。中文長行可能被折成「下一行以空白開頭」，這是格式處理。本機的 file:// 路徑不會放進聯絡人網址。手機匯入測試等上線後做。</p>
+<h2>第五站 用 GitHub 網頁上傳</h2><ol><li>登入 <a href="https://github.com/">GitHub</a>，建立新 repository，例如 <code>my-nfc-card</code>。公開 repository 適合課堂展示；請先確認你同意公開的內容。</li><li>空白 repo 選「uploading an existing file」；若已有檔案，選 <strong>Add file → Upload files</strong>。</li><li>把 <code>my-nfc-card</code> 內的三個檔案拖進上傳區。只拖三檔，不把整份教材上傳。</li><li>填提交訊息，例如 <code>Create digital card</code>，按 Commit changes。</li><li>確認 repo 的最上層直接看得到 index.html、style.css、README.md。</li></ol><p><strong>檢核 B：</strong>把 repository 連結交給同伴，請他指出三檔案和最近一次 commit。這條路徑不需要 Git 指令列；選修指令見 README。</p>
+<h2>第六站 發布到 Vercel</h2><ol><li>登入 <a href="https://vercel.com/">Vercel</a>。選 <strong>Add New → Project</strong>，連接 GitHub 並匯入剛才的 repo。依畫面授權必要的 repository 存取。</li><li><strong>Framework Preset：</strong>選 <code>Other</code>。</li><li><strong>Root Directory：</strong>選含有 index.html 的資料夾。若三檔在 repo 最上層，保留根目錄。</li><li><strong>Build Command：</strong>啟用 Override，欄位留空，跳過建置。不要填 npm run build。</li><li><strong>Output Directory：</strong>本專案沒有 public 資料夾，預設會提供根目錄檔案；如需明確指定，使用 <code>.</code>。不要設 dist。</li><li>點 Deploy，等狀態為 <strong>Ready</strong>；部署時間依實際情況，不保證 5 秒完成。</li><li>在專案的 Domains 找正式 Production 網址，如 <code>https://你的專案.vercel.app</code>。以實際可用的網域為準，不要抄範例，也不要選單次 Preview 部署網址。</li><li>把正式網址填回 index.html 的 <code>website</code>，更新 GitHub 同名檔案並提交到正式分支。本課以 main 為正式分支，等待新部署 Ready。</li></ol>
+<div class="note">本網站不需要 package.json、環境變數、API 金鑰或 Vercel CLI。平台提供的網址要讓接收者不登入也能瀏覽。若出現登入頁，先確認正式網域，再檢查專案的 Deployment Protection。</div><p><strong>檢核 C：</strong>用無痕視窗及另一支手機開正式網址。點 Email 連結確認收件人；有填電話才測電話。重新下載 .vcf，在手機上依提示開啟並確認加入通訊錄，檢查中文姓名、信箱、選填電話與網址。</p><p>若內建瀏覽器無法下載，從選單改用 Safari 或 Chrome 開啟。沒有相同系統的同伴時，記錄你實際測過的設備，不宣稱所有手機都支援。</p>
+<h2>第七站 把正式網址寫進 NFC</h2><ol><li>準備支援 NFC 寫入的手機及可重寫的 NDEF 標籤。開啟 wakdev 的 <strong>NFC Tools</strong>；Android 需要時先打開 NFC 功能。</li><li>選 <strong>Write → Add a record → URL / URI</strong>。</li><li>輸入完整的正式 HTTPS 網址。若 App 將 https:// 作為獨立前綴選項，避免重複輸入。</li><li>確認待寫入清單只有本次的網址記錄，按 <strong>Write</strong>，將標籤靠近手機 NFC 天線，等候成功提示。</li><li>用 <strong>Read</strong> 讀回，逐字確認網址；不要只以嗶聲當成驗收。</li><li>離開寫入介面，由同伴使用另一支相容手機感應，點開通知，確認進入你的網站。</li></ol><p><strong>檢核 D：</strong>請同伴從碰卡到開頁，再下載聯絡人並確認內容。課堂不做永久鎖定；標籤必須可供後續練習。設備不支援時，先用網址互測，NFC 記為「待補測」。</p>
+<h2>第八站 更新一次再驗收</h2><p>修改一句簡介，提交到 GitHub 的正式分支，等待 Vercel 新部署 Ready。使用原本那張 NFC 卡重新開啟網站，確認能看見更新。正式網址不變，所以不用重寫卡片；若沒更新，先查部署與網址，再重新整理。</p>
+<h2>卡住時照這個順序找</h2><table><thead><tr><th>現象</th><th>先檢查</th><th>下一步</th></tr></thead><tbody><tr><td>卡片沒有文字</td><td>profile 的英文引號及逗號</td><td>F12 → Console 查看 SyntaxError，從最後修改欄位檢查</td></tr><tr><td>樣式不見</td><td>style.css 是否同資料夾、大小寫一致</td><td>確認不是 style.css.txt，且 link 的 href 沒改錯</td></tr><tr><td>網站 404</td><td>index.html 是否位於 Root Directory</td><td>Other、空白 Build Command、Output Directory 根目錄</td></tr><tr><td>手機看不到最新內容</td><td>提交分支、部署 Ready、正式網域</td><td>重新整理或無痕開啟</td></tr><tr><td>下載後沒出現在通訊錄</td><td>是否有開啟 .vcf 並確認匯入</td><td>改用 Safari／Chrome，檢查下載項目</td></tr><tr><td>NFC 失敗</td><td>手機 NFC 支援／開關、天線位置、標籤可寫性</td><td>移開金屬、一次只放一張標籤、Read 查內容；請教師換已知可用標籤交叉測試</td></tr></tbody></table>
+<h2>繳交清單</h2><ul><li>□ GitHub repository 連結及正式網站網址。</li><li>□ 一張手機名片畫面，以及聯絡人中文匯入與 NFC 讀取的證據；遮掉不必要的個資。</li><li>□ 完成學習單中的測試表、問題修正及三個反思問題。</li><li>□ 若 NFC 尚未完成，寫明原因、已完成的網址互測與補測安排。</li></ul>
+<h2>官方參考</h2><p><a href="https://vercel.com/docs/builds/configure-a-build">Vercel 靜態網站建置設定</a>：Other 與跳過建置的設定。<a href="https://www.wakdev.com/en/knowledge-base/how-to-guides/how-to-write-a-link-url-on-an-nfc-chip.html">wakdev NFC URL 寫入說明</a>：Write、URL / URI 與讀寫流程。<a href="https://www.rfc-editor.org/rfc/rfc2426">RFC 2426</a>：本範本採用的 vCard 3.0 格式；新版 vCard 規格為 4.0，本課以 3.0 供練習。</p><p class="footer">查核日期 2026 年 10 月 30 日。按 Ctrl＋P 可列印；介面名稱可能因平台版本或語言稍有差異。</p>
+</main></body></html>

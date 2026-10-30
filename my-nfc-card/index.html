@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b0f19">
+  <title>我的 NFC 數位名片</title>
+  <link rel="stylesheet" href="style.css">
+  <script>
+    // ===== 學生編輯區：只修改冒號後的值，保留引號、逗號與括號 =====
+    const profile = {
+      familyName: "林",                 // 姓
+      givenName: "同學",                // 名；畫面自動顯示「姓＋名」
+      nickname: "小林",                 // 不需要暱稱可改為 ""
+      avatar: "林",                     // 頭像內的一個字或縮寫
+      title: "學生 / 創意實作者",
+      org: "國立清華大學",
+      bio: "我喜歡觀察生活中的問題，透過設計與程式，把想法做成可以使用的作品。",
+      phone: "",                        // 選填，例如 +886912345678；空白會隱藏電話
+      email: "student@example.com",     // 範例信箱，請替換成願意公開的聯絡信箱
+      github: "https://github.com/",     // 改成自己的 GitHub 網址；空白會隱藏
+      skills: ["創意思考", "HTML / CSS", "專題實作"],
+      website: ""                       // 部署後填正式 HTTPS 網址；本機測試先留空
+    };
+    // ===== 學生編輯區結束；下方程式供課堂導讀 =====
+  </script>
+</head>
+<body>
+  <main class="card" aria-labelledby="displayName">
+    <div class="card-badge"><span class="pulse-dot" aria-hidden="true"></span>NFC 智慧名片</div>
+    <div class="avatar" id="avatarText" aria-hidden="true"></div>
+    <h1><span id="displayName"></span> <span class="nickname" id="nickname"></span></h1>
+    <p class="title" id="jobTitle"></p>
+    <p class="org" id="organization"></p>
+    <p class="bio" id="biography"></p>
+    <button type="button" class="btn-vcard" id="saveContact">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+        <circle cx="9" cy="7" r="4"></circle><path d="M19 8v6m-3-3h6"></path>
+      </svg>
+      下載聯絡人 .vcf
+    </button>
+    <p class="hint">下載後，請依手機提示開啟並加入通訊錄。</p>
+    <ul class="skills" id="skills" aria-label="技能"></ul>
+    <nav class="links" aria-label="聯絡方式">
+      <a class="link-item" id="phoneLink"><span aria-hidden="true">↗</span> 撥打電話</a>
+      <a class="link-item" id="emailLink"><span aria-hidden="true">✉</span> 發送 Email</a>
+      <a class="link-item" id="githubLink" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⌘</span> GitHub 個人頁面</a>
+    </nav>
+    <p class="status" id="status" role="status" aria-live="polite"></p>
+    <noscript>請啟用 JavaScript，以顯示個人資料與下載聯絡人。</noscript>
+  </main>
+  <script>
+    const fullName = profile.familyName + profile.givenName;
+    const byId = (id) => document.getElementById(id);
+    document.title = fullName + "｜NFC 數位名片";
+    byId("displayName").textContent = fullName;
+    byId("nickname").textContent = profile.nickname ? `(${profile.nickname})` : "";
+    byId("avatarText").textContent = profile.avatar;
+    byId("jobTitle").textContent = profile.title;
+    byId("organization").textContent = profile.org;
+    byId("biography").textContent = profile.bio;
+    profile.skills.forEach((skill) => {
+      const tag = document.createElement("li");
+      tag.className = "tag";
+      tag.textContent = skill;
+      byId("skills").appendChild(tag);
+    });
+
+    function httpsURL(value) {
+      try {
+        const url = new URL(value);
+        return url.protocol === "https:" && !url.username && !url.password ? url.href : "";
+      } catch { return ""; }
+    }
+    function setLink(id, href) {
+      const link = byId(id);
+      link.hidden = !href;
+      if (href) link.href = href;
+    }
+    // 電話只使用數字與開頭的 +；Email 去除換行，避免破壞檔案欄位。
+    const phone = profile.phone.trim();
+    const email = profile.email.trim();
+    const validPhone = /^\+?[0-9]{6,15}$/.test(phone) ? phone : "";
+    const validEmail = /^[^\s@,;:]+@[^\s@,;:]+\.[^\s@,;:]+$/.test(email) ? email : "";
+    setLink("phoneLink", validPhone ? "tel:" + validPhone : "");
+    setLink("emailLink", validEmail ? "mailto:" + encodeURIComponent(validEmail) : "");
+    setLink("githubLink", httpsURL(profile.github));
+    const invalidFields = [];
+    if (phone && !validPhone) invalidFields.push("電話");
+    if (email && !validEmail) invalidFields.push("Email");
+    if (profile.github && !httpsURL(profile.github)) invalidFields.push("GitHub 網址");
+    if (profile.website && !httpsURL(profile.website)) invalidFields.push("正式網址");
+    if (invalidFields.length) byId("status").textContent = "請檢查編輯區格式：" + invalidFields.join("、");
+
+    // vCard 文字值：先處理反斜線，再處理換行、分號和逗號。
+    function escapeVCard(value) {
+      return String(value).replace(/\\/g, "\\\\").replace(/\r\n|\r|\n/g, "\\n")
+        .replace(/;/g, "\\;").replace(/,/g, "\\,");
+    }
+    // 進階閱讀：以 UTF-8 位元組計算，每行最多 75 bytes，避免切斷中文字。
+    function foldVCardLine(line) {
+      const encoder = new TextEncoder();
+      let result = "", segment = "", bytes = 0;
+      for (const char of line) {
+        const size = encoder.encode(char).length;
+        if (bytes + size > 75) {
+          result += segment + "\r\n";
+          segment = " "; bytes = 1;
+        }
+        segment += char; bytes += size;
+      }
+      return result + segment;
+    }
+    function buildVCard() {
+      const e = escapeVCard;
+      const lines = [
+        "BEGIN:VCARD", "VERSION:3.0",
+        `N:${e(profile.familyName)};${e(profile.givenName)};;;`,
+        `FN:${e(fullName)}`,
+        `ORG:${e(profile.org)}`,
+        `TITLE:${e(profile.title)}`
+      ];
+      if (profile.nickname) lines.push(`NICKNAME:${e(profile.nickname)}`);
+      if (validPhone) lines.push(`TEL;TYPE=CELL:${validPhone}`);
+      if (validEmail) lines.push(`EMAIL;TYPE=INTERNET:${validEmail}`);
+      // 本機 file:// 路徑不寫入聯絡人；上線後使用設定的正式網址。
+      const website = httpsURL(profile.website) ||
+        (location.protocol === "https:" ? location.origin + location.pathname : "");
+      if (website) lines.push(`URL:${website}`);
+      lines.push("END:VCARD");
+      return lines.map(foldVCardLine).join("\r\n") + "\r\n";
+    }
+    function downloadVCard() {
+      const blob = new Blob([buildVCard()], { type: "text/vcard;charset=utf-8" });
+      const objectURL = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = objectURL;
+      link.download = fullName.replace(/[\\/:*?"<>|]/g, "_") + "_聯絡資訊.vcf";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      // 留時間讓瀏覽器讀取下載內容，再釋放暫存網址。
+      setTimeout(() => URL.revokeObjectURL(objectURL), 30000);
+      byId("status").textContent = "已發出下載要求；請開啟 .vcf 檔並確認匯入。若無反應，請使用 Safari 或 Chrome 開啟本頁。";
+    }
+    byId("saveContact").addEventListener("click", downloadVCard);
+  </script>
+</body>
+</html>
