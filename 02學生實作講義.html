@@ -1,4 +1,4 @@
-<!doctype html><html lang="zh-TW"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NFC 數位名片學生實作講義</title><link rel="stylesheet" href="教材樣式.css"></head><body><main>
+<!doctype html><html lang="zh-TW"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NFC 數位名片學生實作講義</title><link rel="stylesheet" href="教材樣式.css"><script src="學生互動.js" defer></script></head><body><main>
 <nav><a href="開始閱讀.html">套件首頁</a><a href="01教師教案.html">教師教案</a><a href="03程式導讀與學習單.html">程式與學習單</a></nav>
 <header><p class="eyebrow">02　學生實作講義</p><h1>做出你的 NFC 數位名片</h1><p class="lead">今天要完成一個別人用手機就能開啟的個人網頁，再把網址寫進 NFC 標籤。你只需修改三檔案範本，不必安裝 Node.js 或 npm。</p></header>
 <h2>第一站 想好你要介紹什麼</h2><p>想像你在成果展遇見想合作的人。寫下你的身分、能提供的能力與希望交流的方向。簡介避免只寫「我很認真」，改成具體內容，例如「我擅長整理訪談資料，希望找到一起做校園服務設計的夥伴」。</p><ul><li>姓名或展示名：＿＿＿＿＿＿　職稱／身分：＿＿＿＿＿＿</li><li>40 至 80 字簡介：＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿</li><li>三個技能：＿＿＿＿＿＿、＿＿＿＿＿＿、＿＿＿＿＿＿</li><li>願意公開的信箱／作品連結：＿＿＿＿＿＿＿＿＿＿＿＿</li></ul><div class="note">電話可留空。請只填願意公開的資料，範例信箱不是你的信箱。不要把登入密碼、學號或任何金鑰貼進程式。</div>
@@ -6,6 +6,28 @@
 ├── index.html   個人資料、網頁結構、原生 JavaScript
 ├── style.css    配色、字級、排版與手機樣式
 └── README.md    修改及發布說明</pre><ol><li>雙擊 <code>index.html</code>，確認瀏覽器看得到預設名片。</li><li>用純文字編輯器開啟同一個 <code>index.html</code>。不要用 Word 編輯程式。</li><li>若 Windows 沒顯示副檔名，先在檔案總管開啟「顯示副檔名」，避免誤存為 <code>index.html.txt</code>。</li></ol>
+<section id="html-lab" class="lesson-lab" aria-labelledby="html-heading">
+<p class="eyebrow">先看懂 再動手　約 10 分鐘</p><h2 id="html-heading">HTML 小實驗 內容怎麼變成網頁</h2>
+<p>HTML 用標籤描述內容。<code>&lt;h2&gt;王小晴&lt;/h2&gt;</code> 由開始標籤、內容、結束標籤組成；瀏覽器會把它理解為第二層標題。標題層級應反映文章結構，字體大小交給 CSS 決定。</p>
+<table><thead><tr><th>標籤或屬性</th><th>用途</th><th>名片中的例子</th></tr></thead><tbody><tr><td>h1、h2</td><td>主要標題、章節標題</td><td>姓名或作品區標題</td></tr><tr><td>p、strong</td><td>段落、重要內容</td><td>簡介，以及想強調的專長</td></tr><tr><td>a 與 href</td><td>連結與目的地</td><td>&lt;a href="https://github.com/你的帳號"&gt;我的作品&lt;/a&gt;</td></tr><tr><td>class</td><td>可共用的分類名稱，讓 CSS 選到元素</td><td>class="bio" 對應 .bio</td></tr><tr><td>id</td><td>頁面中唯一的識別名稱</td><td>id="displayName" 讓 JS 找到姓名位置</td></tr></tbody></table>
+<p>屬性寫在開始標籤裡，例如 <code>class="bio"</code>。<code>&lt;strong&gt;</code> 要放在段落內時，先結束 strong，再結束 p，讓標籤正確巢狀配對。</p>
+<div class="lab-interactive" hidden>
+<label for="htmlEditor" class="lab-label">練習程式碼</label><textarea id="htmlEditor" class="code-editor" rows="7" spellcheck="false" autocapitalize="off" aria-describedby="html-task">&lt;h2&gt;王小晴的名片&lt;/h2&gt;
+&lt;p&gt;我喜歡把想法做成作品。&lt;/p&gt;
+&lt;p&gt;我擅長 &lt;strong&gt;資訊設計&lt;/strong&gt;。&lt;/p&gt;</textarea>
+<p id="html-task">任務：①改成自己的展示名；②新增一段「希望合作的方向」；③把一個關鍵字放進 strong。先猜結果，再按預覽。</p>
+<div class="lab-actions"><button type="button" id="runHtml">更新 HTML 預覽</button><button type="button" id="resetHtml" class="secondary-button">還原 HTML 範例</button></div>
+<p class="lab-label">瀏覽器看到的結果</p><iframe id="htmlPreview" title="HTML 練習預覽" sandbox="" referrerpolicy="no-referrer"></iframe>
+<p id="htmlFeedback" class="lab-feedback" role="status" aria-live="polite"></p>
+<p class="meta">這裡練習 h1–h3、p、strong、em、ul、li、div、span 與 a 等基本標籤；預覽會略過其他標籤與事件屬性，連結僅顯示文字。回到真正的名片再測試 href。練習不會修改你的專案檔案，重新整理會還原。</p>
+</div>
+<noscript><p class="note">啟用 JavaScript 可直接編輯與預覽；也可以在本機 index.html 的副本中練習以下任務。</p></noscript>
+<details><summary>看一個參考寫法</summary><pre><code>&lt;h2&gt;王小晴的名片&lt;/h2&gt;
+&lt;p&gt;我喜歡把想法做成作品。&lt;/p&gt;
+&lt;p&gt;我擅長 &lt;strong&gt;資訊設計&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;希望找到一起改善校園服務的夥伴。&lt;/p&gt;</code></pre></details>
+<p><strong>帶回你的作品：</strong>在名片 index.html 的 <code>&lt;p class="bio" id="biography"&gt;&lt;/p&gt;</code> 後面，另加 <code>&lt;p class="motto"&gt;讓想法變成作品。&lt;/p&gt;</code>。儲存、重新整理，觀察新段落。保留既有 id，避免 JS 找不到原本的元素。稍後用 CSS 幫 motto 加樣式。</p>
+</section>
 <h2>第三站 只改頂部個人資料</h2><p>找到「學生編輯區」的 <code>const profile = { ... }</code>。只改冒號後的值。下面是示意，請修改原檔，不必把整段重複貼一次。</p><pre><code>const profile = {
   familyName: "王",
   givenName: "小晴",
@@ -23,7 +45,32 @@
 <table><thead><tr><th>欄位</th><th>修改規則</th></tr></thead><tbody><tr><td>familyName／givenName</td><td>分別填姓與名，畫面自動組合，聯絡人也用同一份資料</td></tr><tr><td>nickname／avatar</td><td>暱稱選填；頭像用一個字或短縮寫</td></tr><tr><td>title／org／bio</td><td>身分、單位與個人簡介；在引號內編輯</td></tr><tr><td>phone</td><td>選填；格式如 +886912345678。台灣手機 0912… 改國際格式時去掉開頭 0，再加 +886</td></tr><tr><td>email</td><td>自己的公開信箱；不想公開可填 ""</td></tr><tr><td>github</td><td>完整 https:// 網址；不需要可填 ""</td></tr><tr><td>skills</td><td>每個技能有引號，以英文逗號分隔；空陣列 [] 會沒有技能標籤</td></tr><tr><td>website</td><td>部署前留空；取得正式網址後再填</td></tr></tbody></table>
 <p><strong>語法小提醒：</strong>保留英文雙引號 <code>"</code>、逗號 <code>,</code>、大括號 <code>{}</code>。不要用中文全形引號取代。字串中要寫英文雙引號時，使用 <code>\"</code>，或改用中文「」；實際換行用 <code>\n</code>。修改後按儲存，再回瀏覽器重新整理。</p>
 <p><strong>檢核 A：</strong>姓名和簡介是你自己的；至少三個技能；電話留空時不顯示電話連結；卡片底部沒有欄位格式錯誤提示。</p>
-<h2>第四站 改一點樣式並測試下載</h2><ol><li>開啟 <code>style.css</code>，試改頂部 <code>--accent: #38bdf8;</code>，例如改為 <code>#5eead4</code>。儲存後重新整理，觀察職稱與標籤顏色。</li><li>把瀏覽器視窗縮窄到手機寬度。確認姓名、簡介與按鈕沒有被切掉，也沒有左右捲動。</li><li>按 Tab 鍵切換焦點，應看得到焦點外框；按 Enter 或空白鍵可啟動下載按鈕。</li><li>點「下載聯絡人 .vcf」，到瀏覽器下載項目找檔案，用文字編輯器檢查內容。</li></ol><pre>BEGIN:VCARD
+<h2>第四站 改一點樣式並測試下載</h2>
+<section id="css-lab" class="lesson-lab" aria-labelledby="css-heading"><p class="eyebrow">調整 看結果 說原因　約 10 分鐘</p><h3 id="css-heading">CSS 小實驗 一條規則怎麼讀</h3>
+<pre><code>.motto {
+  color: #38bdf8;
+  font-size: 16px;
+  padding: 12px;
+}</code></pre><p><code>.motto</code> 是選擇器，表示選到 class="motto" 的元素。大括號內每行用「屬性：值；」設定樣式。<code>p</code> 選所有段落，<code>.motto</code> 選一類元素，<code>#displayName</code> 選特定 id；class 與 id 名稱不要混用。</p>
+<table><thead><tr><th>CSS 屬性</th><th>調整什麼</th><th>試著觀察</th></tr></thead><tbody><tr><td>color／background</td><td>文字色／背景色</td><td>文字與背景是否容易辨識</td></tr><tr><td>font-size</td><td>文字大小，例如 16px</td><td>放大後會不會換行</td></tr><tr><td>padding</td><td>邊框內側、內容周圍的留白</td><td>文字離邊框更遠</td></tr><tr><td>margin</td><td>邊框外側、和其他元素的距離</td><td>不是把卡片裡面撐開</td></tr><tr><td>border／border-radius</td><td>邊框／圓角</td><td>同樣內容可以有不同外觀</td></tr></tbody></table>
+<p>盒模型由內到外是「內容 → padding → border → margin」。本範本使用 <code>box-sizing: border-box</code>，因此設定寬度已包含 padding 與 border。初學時一次只改一個值，才能看清因果。</p>
+<div class="lab-interactive" hidden>
+<div class="lab-controls"><label for="cssColor">文字色 <input id="cssColor" type="color" value="#075985"></label><label for="cssFont">字級 <output id="cssFontValue" for="cssFont">18px</output><input id="cssFont" type="range" min="14" max="28" value="18"></label><label for="cssPadding">內距 <output id="cssPaddingValue" for="cssPadding">16px</output><input id="cssPadding" type="range" min="0" max="40" value="16"></label><label for="cssRadius">圓角 <output id="cssRadiusValue" for="cssRadius">12px</output><input id="cssRadius" type="range" min="0" max="32" value="12"></label></div>
+<div class="practice-stage"><div id="cssPreview" class="practice-card">你好，我是小晴。<br>我想用設計改善生活。</div></div>
+<p class="lab-label">對應的 CSS 隨你調整</p><pre><code id="cssCode">.practice-card {
+  color: #075985;
+  font-size: 18px;
+  padding: 16px;
+  border-radius: 12px;
+}</code></pre><button type="button" id="resetCss" class="secondary-button">還原 CSS 數值</button><p id="cssFeedback" class="lab-feedback" role="status" aria-live="polite"></p>
+</div><p><strong>觀察任務：</strong>把 padding 從 0 調到 40，說明「哪一段空間」變大。再把 font-size 從 14 調到 28，觀察換行。最後把圓角設為 0，看看有沒有影響文字內容。</p>
+<p><strong>帶回你的作品：</strong>把本節開頭的 <code>.motto { ... }</code> 規則加到 style.css 最後。儲存後，確認剛加的座右銘變色，而且其他段落沒有一起變色。互動範例的 <code>.practice-card</code> 只選到練習卡片；要用在作品，請改成實際的 class 名稱。</p>
+<details><summary>找錯練習 為什麼這一行沒效果</summary><pre><code>.motto {
+  font-size: 24;
+}</code></pre><p>一般非零字級值需要單位，例如 <code>24px</code>。也要檢查選擇器是否寫成 <code>.motto</code>，以及每個宣告後是否有分號。瀏覽器常略過錯誤的 CSS 宣告，所以「頁面還能開」不表示每條規則都有效。</p></details></section>
+<section id="quick-check" class="lesson-lab" aria-labelledby="quiz-heading"><h3 id="quiz-heading">三題小測驗 先選答案再看解釋</h3>
+<form id="basicsQuiz"><fieldset><legend>1. 要新增一段座右銘，最適合使用什麼？</legend><label><input type="radio" name="q1" value="a"> p 段落標籤</label><label><input type="radio" name="q1" value="b"> 只改背景色</label><p id="q1Feedback" class="lab-feedback" aria-live="polite"></p></fieldset><fieldset><legend>2. 想選到 class="motto"，CSS 應寫哪個選擇器？</legend><label><input type="radio" name="q2" value="a"> #motto</label><label><input type="radio" name="q2" value="b"> .motto</label><p id="q2Feedback" class="lab-feedback" aria-live="polite"></p></fieldset><fieldset><legend>3. 想增加文字與卡片邊框之間的內側留白，調哪個？</legend><label><input type="radio" name="q3" value="a"> margin</label><label><input type="radio" name="q3" value="b"> padding</label><p id="q3Feedback" class="lab-feedback" aria-live="polite"></p></fieldset><div class="lab-actions lab-interactive" hidden><button type="submit">檢查答案</button><button type="reset" class="secondary-button">重新作答</button></div><p id="quizFeedback" class="lab-feedback" role="status" aria-live="polite"></p></form><details><summary>紙本或離線自學參考答案</summary><p>第 1 題選 p；第 2 題選 .motto；第 3 題選 padding。HTML 描述內容，CSS 負責樣式；. 對應 class，# 對應 id；padding 在邊框內，margin 在邊框外。</p></details></section>
+<h3>回到名片 檢查樣式與聯絡人</h3><ol><li>開啟 <code>style.css</code>，試改頂部 <code>--accent: #38bdf8;</code>，例如改為 <code>#5eead4</code>。儲存後重新整理，觀察職稱與標籤顏色。</li><li>把瀏覽器視窗縮窄到手機寬度。確認姓名、簡介與按鈕沒有被切掉，也沒有左右捲動。</li><li>按 Tab 鍵切換焦點，應看得到焦點外框；按 Enter 或空白鍵可啟動下載按鈕。</li><li>點「下載聯絡人 .vcf」，到瀏覽器下載項目找檔案，用文字編輯器檢查內容。</li></ol><pre>BEGIN:VCARD
 VERSION:3.0
 N:王;小晴;;;
 FN:王小晴
@@ -39,4 +86,5 @@ END:VCARD</pre><p>有填 Email 才會有 EMAIL；有填有效電話才會有 TEL
 <h2>卡住時照這個順序找</h2><table><thead><tr><th>現象</th><th>先檢查</th><th>下一步</th></tr></thead><tbody><tr><td>卡片沒有文字</td><td>profile 的英文引號及逗號</td><td>F12 → Console 查看 SyntaxError，從最後修改欄位檢查</td></tr><tr><td>樣式不見</td><td>style.css 是否同資料夾、大小寫一致</td><td>確認不是 style.css.txt，且 link 的 href 沒改錯</td></tr><tr><td>網站 404</td><td>index.html 是否位於 Root Directory</td><td>Other、空白 Build Command、Output Directory 根目錄</td></tr><tr><td>手機看不到最新內容</td><td>提交分支、部署 Ready、正式網域</td><td>重新整理或無痕開啟</td></tr><tr><td>下載後沒出現在通訊錄</td><td>是否有開啟 .vcf 並確認匯入</td><td>改用 Safari／Chrome，檢查下載項目</td></tr><tr><td>NFC 失敗</td><td>手機 NFC 支援／開關、天線位置、標籤可寫性</td><td>移開金屬、一次只放一張標籤、Read 查內容；請教師換已知可用標籤交叉測試</td></tr></tbody></table>
 <h2>繳交清單</h2><ul><li>□ GitHub repository 連結及正式網站網址。</li><li>□ 一張手機名片畫面，以及聯絡人中文匯入與 NFC 讀取的證據；遮掉不必要的個資。</li><li>□ 完成學習單中的測試表、問題修正及三個反思問題。</li><li>□ 若 NFC 尚未完成，寫明原因、已完成的網址互測與補測安排。</li></ul>
 <h2>官方參考</h2><p><a href="https://vercel.com/docs/builds/configure-a-build">Vercel 靜態網站建置設定</a>：Other 與跳過建置的設定。<a href="https://www.wakdev.com/en/knowledge-base/how-to-guides/how-to-write-a-link-url-on-an-nfc-chip.html">wakdev NFC URL 寫入說明</a>：Write、URL / URI 與讀寫流程。<a href="https://www.rfc-editor.org/rfc/rfc2426">RFC 2426</a>：本範本採用的 vCard 3.0 格式；新版 vCard 規格為 4.0，本課以 3.0 供練習。</p><p class="footer">查核日期 2026 年 10 月 30 日。按 Ctrl＋P 可列印；介面名稱可能因平台版本或語言稍有差異。</p>
+<p class="footer">互動教材更新：2026 年 11 月 2 日。練習在瀏覽器本機進行，不上傳你的作答；重新整理後還原。列印版保留講解、任務與參考答案。</p>
 </main></body></html>
